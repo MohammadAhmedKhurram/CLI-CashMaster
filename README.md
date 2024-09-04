@@ -9,6 +9,9 @@ This project was developed as an assignment for the first quarter of the Governo
 # Features
 
 Randomly Generated PIN: Users have three attempts to enter the correct PIN.
+
 Withdrawal Options: Users can withdraw from preset amounts.
+
 Balance Checking: Users can check their account balance at any time.
+
 Session Management: Users can perform multiple operations until they choose to exit.

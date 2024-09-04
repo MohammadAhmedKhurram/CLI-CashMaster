@@ -1,6 +1,6 @@
 {
-  "name": "cli_cashmaster",
-  "version": "1.0.4",
+  "name": "cli-cashmaster",
+  "version": "1.0.5",
   "description": "A TypeScript-based command-line ATM simulator using Node.js, Inquirer, and Chalk. This program allows users to log in with a PIN, check their account balance, withdraw funds, and exit.",
   "main": "123.js",
   "type": "module",

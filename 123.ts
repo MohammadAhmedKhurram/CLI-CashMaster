@@ -1,77 +1,86 @@
 #!/usr/bin/env node
 
 import inquirer from "inquirer";
+import chalk from "chalk";
 
-console.log("Welcome To The Only Choice ATM");
+console.log(chalk.blue.bold("Welcome to the ATM!"));
 
-const card = await inquirer.prompt([
-    {
-        type: "input",
-        message: "Please Insert Your Card",
-        name: "Card"
-    }
-]);
+await inquirer.prompt({
+    type: "input",
+    message: chalk.yellow("Please insert your card..."),
+    name: "Card"
+});
 
-let attempts = 1;
+let accountBalance = 50_000;
+let loggedIn = false;
 
-while (attempts <= 3) {
-    const input = await inquirer.prompt([
-        {
+while (!loggedIn) {
+    const randomNum1: number = Math.floor(Math.random() * 9 + 1);
+    const randomNum2: number = Math.floor(Math.random() * 9 + 1);
+    const randomNum3: number = Math.floor(Math.random() * 9 + 1);
+    const randomNum4: number = Math.floor(Math.random() * 9 + 1);
+    const pin: string = `${randomNum1}${randomNum2}${randomNum3}${randomNum4}`;
+
+    let attempts = 1;
+
+    while (attempts <= 3) {
+        const password = await inquirer.prompt({
             type: "input",
-            message: "Please Enter Your PIN! (Your PIN Is 123.)",
-            name: "pin",
-        }
-    ]);
+            name: "Password",
+            message: chalk.cyan(`Please enter your PIN (Your PIN is ${chalk.green(pin)})`)
+        });
 
-    const pin = input.pin;
-
-    if (pin === "123") {
-        console.log("PIN Verified. You are logged in.");
-
-        const input2 = await inquirer.prompt([
-            {
-                type: "list",
-                message: "What would you like to proceed?",
-                name: "choice",
-                choices: ["Withdrawal", "Check Balance"]
-            }
-        ]);
-
-        const selectedChoice = input2.choice;
-
-        if (selectedChoice === "Withdrawal") {
-            const withdrawalAmount = await inquirer.prompt([
-                {
-                    type: "list",
-                    message: "How much would you like to withdraw? (Your balance = 50,000)",
-                    name: "amount",
-                    choices: ["1000", "5000", "10000", "20000"]
-                }
-            ]);
-
-            const selectedAmount = parseInt(withdrawalAmount.amount); // Convert selectedAmount to integer
-            let balance = 50000
-
-            if (selectedAmount > balance) {
-                console.log("Insufficient balance. Please enter a lower amount.");
-            } else {
-                const newBalance = balance - selectedAmount;
-                console.log(`Successfully withdrew ${selectedAmount}. Current balance: ${newBalance}`);
-                console.log("Thank you!");
-            }
-        } else if (selectedChoice === "Check Balance") {
-            console.log("Your Account Balance is 50,000.");
-            console.log("Thank you!");
-        } else {
-            console.log("Invalid choice.");
-        }
-        break;
-    } else {
-        if (attempts === 3) {
-            console.log("Too many incorrect attempts. Account locked. Please contact customer support.");
+        const code = password.Password;
+        if (code === pin) {
+            console.log(chalk.green("You are logged in!"));
+            loggedIn = true;
             break;
+        } else {
+            console.log(chalk.red("Incorrect PIN!"));
+            attempts += 1;
+            if (attempts <= 3) {
+                console.log(chalk.yellow(`Attempts left: ${4 - attempts}`));
+            }
         }
-        console.log(`Incorrect PIN. Attempts left: ${3 - attempts}`);
-        attempts++;
+    }
+
+    if (attempts > 3) {
+        console.log(chalk.bgRed.white("Maximum attempts reached! You are locked out."));
+        process.exit();
+    }
+}
+
+let exit = false;
+
+while (!exit) {
+    const operation = await inquirer.prompt({
+        type: "list",
+        message: chalk.blue("What would you like to do?"),
+        choices: ["Withdrawal", "Check Balance", "Exit"],
+        name: "Operation"
+    });
+
+    const selectedChoice = operation.Operation;
+
+    if (selectedChoice === "Withdrawal") {
+        const amount = await inquirer.prompt({
+            type: "list",
+            message: chalk.cyan(`How much would you like to withdraw? Your account balance: ${chalk.green(accountBalance)}`),
+            choices: ["1000", "5000", "10000", "20000"],
+            name: "Amount"
+        });
+
+        const selectedAmount = parseInt(amount.Amount, 10);
+        if (selectedAmount > accountBalance) {
+            console.log(chalk.red("Insufficient balance."));
+        } else {
+            accountBalance -= selectedAmount;
+            console.log(chalk.green(`Successfully withdrew ${selectedAmount}. Current balance: ${accountBalance}`));
+        }
+    } else if (selectedChoice === "Check Balance") {
+        console.log(chalk.green(`Your account balance is ${accountBalance}`));
+    } else if (selectedChoice === "Exit") {
+        console.log(chalk.magenta("Thank you for using the ATM. Goodbye!"));
+        exit = true;
     }
 }
